@@ -82,6 +82,7 @@ cc_library_shared {
         "ExternalCameraDevice.cpp",
         "ExternalCameraDeviceSession.cpp",
         "ExternalCameraUtils.cpp",
+        "Libve_Decoder2.c",
     ],
     shared_libs: [
         "libhidlbase",
@@ -106,11 +107,17 @@ cc_library_shared {
         "libjpeg",
         "libexif",
         "libtinyxml2",
+        "libvencoder",
+        "libvdecoder",
+        "libMemAdapter",
     ],
     static_libs: [
         "android.hardware.camera.common@1.0-helper",
     ],
     local_include_dirs: ["include/ext_device_v3_4_impl"],
+    include_dirs: [
+        "frameworks/av/media/libcedarc/include",
+    ],
     export_shared_lib_headers: [
         "libfmq",
     ],

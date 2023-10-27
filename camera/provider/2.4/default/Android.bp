@@ -88,6 +88,9 @@ cc_library_shared {
         "camera.device@3.6-external-impl_headers",
     ],
     export_include_dirs: ["."],
+    include_dirs: [
+        "frameworks/av/media/libcedarc/include",
+    ],
 }
 
 cc_library_shared {
@@ -136,6 +139,9 @@ cc_library_shared {
         "android.hardware.camera.common@1.0-helper",
     ],
     export_include_dirs: ["."],
+    include_dirs: [
+        "frameworks/av/media/libcedarc/include",
+    ],
 }
 
 cc_defaults {

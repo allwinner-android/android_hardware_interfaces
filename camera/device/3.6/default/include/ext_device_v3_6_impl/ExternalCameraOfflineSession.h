@@ -110,6 +110,20 @@ struct ExternalCameraOfflineSession : public virtual RefBase,
         return new TrampolineSessionInterface_3_6(this);
     }
 
+    virtual VideoDecoder* getVideoDecoder() {
+        return mDecoder;
+    }
+    virtual VideoStreamInfo getVideoStreamInfo() {
+        return mVideoInfo;
+    }
+    virtual VConfig getVideoConfig() {
+        return mVideoConf;
+    }
+    virtual VideoStreamDataInfo getVideoStreamDataInfo() {
+        return mDataInfo;
+    }
+
+
 protected:
 
     // Methods from OutputThreadInterface
@@ -199,6 +213,10 @@ protected:
     sp<V3_5::implementation::ExternalCameraDeviceSession::BufferRequestThread> mBufferRequestThread;
     sp<OutputThread> mOutputThread;
 private:
+    VideoDecoder *                     mDecoder;
+    VConfig                            mVideoConf;
+    VideoStreamInfo                    mVideoInfo;
+    VideoStreamDataInfo                mDataInfo;
 
     struct TrampolineSessionInterface_3_6 : public ICameraOfflineSession {
         TrampolineSessionInterface_3_6(sp<ExternalCameraOfflineSession> parent) :

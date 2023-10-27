@@ -31,7 +31,7 @@
 #include "utils/Timers.h"
 #include <CameraMetadata.h>
 #include <HandleImporter.h>
-
+#include "../Libve_Decoder2.h"
 
 using ::android::hardware::graphics::mapper::V2_0::IMapper;
 using ::android::hardware::graphics::mapper::V2_0::YCbCrLayout;
@@ -275,6 +275,11 @@ struct OutputThreadInterface : public virtual RefBase {
             std::shared_ptr<HalRequest>&) = 0;
 
     virtual ssize_t getJpegBufferSize(uint32_t width, uint32_t height) const = 0;
+
+    virtual  VideoDecoder* getVideoDecoder() = 0;
+    virtual  VideoStreamInfo getVideoStreamInfo() = 0;
+    virtual  VConfig getVideoConfig() = 0;
+    virtual  VideoStreamDataInfo getVideoStreamDataInfo() = 0;
 };
 
 }  // namespace implementation

@@ -15,7 +15,7 @@
  */
 
 #define LOG_TAG "CamPrvdr@2.4-external"
-//#define LOG_NDEBUG 0
+#define LOG_NDEBUG 0
 #include <log/log.h>
 
 #include <regex>
@@ -215,6 +215,7 @@ void ExternalCameraProviderImpl_2_4::addExternalCamera(const char* devName) {
     std::string deviceName;
     std::string cameraId = std::to_string(mCfg.cameraIdOffset +
                                           std::atoi(devName + kDevicePrefixLen));
+    ALOGI("ExtCam: adding %s to External Camera HAL cameraId = %s!", devName, cameraId.c_str());
     if (mPreferredHal3MinorVersion == 6) {
         deviceName = std::string("device@3.6/external/") + cameraId;
     } else if (mPreferredHal3MinorVersion == 5) {
@@ -229,6 +230,7 @@ void ExternalCameraProviderImpl_2_4::addExternalCamera(const char* devName) {
 }
 
 void ExternalCameraProviderImpl_2_4::deviceAdded(const char* devName) {
+    ALOGD("bill %s %s", __func__, devName);
     {
         base::unique_fd fd(::open(devName, O_RDWR));
         if (fd.get() < 0) {
@@ -262,6 +264,7 @@ void ExternalCameraProviderImpl_2_4::deviceAdded(const char* devName) {
 }
 
 void ExternalCameraProviderImpl_2_4::deviceRemoved(const char* devName) {
+    ALOGD("bill %s %s", __func__, devName);
     Mutex::Autolock _l(mLock);
     std::string deviceName;
     std::string cameraId = std::to_string(mCfg.cameraIdOffset +

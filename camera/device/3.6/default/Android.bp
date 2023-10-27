@@ -71,6 +71,9 @@ cc_library_shared {
         "android.hardware.camera.common@1.0-helper",
     ],
     local_include_dirs: ["include/ext_device_v3_6_impl"],
+    include_dirs: [
+        "frameworks/av/media/libcedarc/include",
+    ],
     export_shared_lib_headers: [
         "libfmq",
     ],

@@ -887,8 +887,8 @@ ExternalCameraConfig::ExternalCameraConfig() :
         depthEnabled(false),
         orientation(kDefaultOrientation) {
     fpsLimits.push_back({/*Size*/{ 640,  480}, /*FPS upper bound*/30.0});
-    fpsLimits.push_back({/*Size*/{1280,  720}, /*FPS upper bound*/7.5});
-    fpsLimits.push_back({/*Size*/{1920, 1080}, /*FPS upper bound*/5.0});
+    fpsLimits.push_back({/*Size*/{1280,  720}, /*FPS upper bound*/30.0});
+    fpsLimits.push_back({/*Size*/{1920, 1080}, /*FPS upper bound*/30.0});
     minStreamSize = {0, 0};
 }
 

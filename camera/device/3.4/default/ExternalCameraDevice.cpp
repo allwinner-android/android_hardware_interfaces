@@ -39,8 +39,12 @@ namespace {
 // Other formats to consider in the future:
 // * V4L2_PIX_FMT_YVU420 (== YV12)
 // * V4L2_PIX_FMT_YVYU (YVYU: can be converted to YV12 or other YUV420_888 formats)
-const std::array<uint32_t, /*size*/ 2> kSupportedFourCCs{
-    {V4L2_PIX_FMT_MJPEG, V4L2_PIX_FMT_Z16}};  // double braces required in C++11
+const std::array<uint32_t, /*size*/ 4> kSupportedFourCCs{
+    { V4L2_PIX_FMT_MJPEG,
+      V4L2_PIX_FMT_Z16,
+      V4L2_PIX_FMT_YUYV,
+      V4L2_PIX_FMT_H264
+    }};  // double braces required in C++11
 
 constexpr int MAX_RETRY = 5; // Allow retry v4l2 open failures a few times.
 constexpr int OPEN_RETRY_SLEEP_US = 100000; // 100ms * MAX_RETRY = 0.5 seconds
@@ -275,6 +279,8 @@ status_t ExternalCameraDevice::initAvailableCapabilities(
         switch (fmt.fourcc) {
             case V4L2_PIX_FMT_Z16: hasDepth = true; break;
             case V4L2_PIX_FMT_MJPEG: hasColor = true; break;
+            case V4L2_PIX_FMT_YUYV: hasColor = true; break;
+            case V4L2_PIX_FMT_H264: hasColor = true; break;
             default: ALOGW("%s: Unsupported format found", __FUNCTION__);
         }
     }
@@ -427,6 +433,7 @@ status_t ExternalCameraDevice::initDefaultCharsKeys(
     // orientation should be 0. For devices with natural portrait display (phone), the orientation
     // should be 270.
     const int32_t orientation = mCfg.orientation;
+    ALOGD("orientation:%d", orientation);
     UPDATE(ANDROID_SENSOR_ORIENTATION, &orientation, 1);
 
     // android.shading
@@ -700,9 +707,13 @@ status_t ExternalCameraDevice::initOutputCharsKeys(
 
     // For V4L2_PIX_FMT_Z16
     std::array<int, /*size*/ 1> halDepthFormats{{HAL_PIXEL_FORMAT_Y16}};
-    // For V4L2_PIX_FMT_MJPEG
+    // For V4L2_PIX_FMT_MJPEG, V4L2_PIX_FMT_YUYV, V4L2_PIX_FMT_H264
     std::array<int, /*size*/ 3> halFormats{{HAL_PIXEL_FORMAT_BLOB, HAL_PIXEL_FORMAT_YCbCr_420_888,
                                             HAL_PIXEL_FORMAT_IMPLEMENTATION_DEFINED}};
+
+    bool isMJPEG = false;
+    bool isYUYV  = false;
+    bool isH264  = false;
 
     for (const auto& supportedFormat : mSupportedFormats) {
         switch (supportedFormat.fourcc) {
@@ -711,6 +722,15 @@ status_t ExternalCameraDevice::initOutputCharsKeys(
                 break;
             case V4L2_PIX_FMT_MJPEG:
                 hasColor = true;
+                isMJPEG = true;
+                break;
+            case V4L2_PIX_FMT_YUYV:
+                hasColor = true;
+                isYUYV = true;
+                break;
+            case V4L2_PIX_FMT_H264:
+                hasColor = true;
+                isH264 = true;
                 break;
             default:
                 ALOGW("%s: format %c%c%c%c is not supported!", __FUNCTION__,
@@ -727,11 +747,26 @@ status_t ExternalCameraDevice::initOutputCharsKeys(
                 ANDROID_DEPTH_AVAILABLE_DEPTH_STALL_DURATIONS);
     }
     if (hasColor) {
-        initOutputCharskeysByFormat(metadata, V4L2_PIX_FMT_MJPEG, halFormats,
-                ANDROID_SCALER_AVAILABLE_STREAM_CONFIGURATIONS_OUTPUT,
-                ANDROID_SCALER_AVAILABLE_STREAM_CONFIGURATIONS,
-                ANDROID_SCALER_AVAILABLE_MIN_FRAME_DURATIONS,
-                ANDROID_SCALER_AVAILABLE_STALL_DURATIONS);
+        if (isMJPEG) {
+            initOutputCharskeysByFormat(metadata, V4L2_PIX_FMT_MJPEG, halFormats,
+                    ANDROID_SCALER_AVAILABLE_STREAM_CONFIGURATIONS_OUTPUT,
+                    ANDROID_SCALER_AVAILABLE_STREAM_CONFIGURATIONS,
+                    ANDROID_SCALER_AVAILABLE_MIN_FRAME_DURATIONS,
+                    ANDROID_SCALER_AVAILABLE_STALL_DURATIONS);
+        } else if (isYUYV) {
+            initOutputCharskeysByFormat(metadata, V4L2_PIX_FMT_YUYV, halFormats,
+                    ANDROID_SCALER_AVAILABLE_STREAM_CONFIGURATIONS_OUTPUT,
+                    ANDROID_SCALER_AVAILABLE_STREAM_CONFIGURATIONS,
+                    ANDROID_SCALER_AVAILABLE_MIN_FRAME_DURATIONS,
+                    ANDROID_SCALER_AVAILABLE_STALL_DURATIONS);
+        } else if (isH264) {
+            initOutputCharskeysByFormat(metadata, V4L2_PIX_FMT_H264, halFormats,
+                    ANDROID_SCALER_AVAILABLE_STREAM_CONFIGURATIONS_OUTPUT,
+                    ANDROID_SCALER_AVAILABLE_STREAM_CONFIGURATIONS,
+                    ANDROID_SCALER_AVAILABLE_MIN_FRAME_DURATIONS,
+                    ANDROID_SCALER_AVAILABLE_STALL_DURATIONS);
+        }
+
     }
 
     calculateMinFps(metadata);

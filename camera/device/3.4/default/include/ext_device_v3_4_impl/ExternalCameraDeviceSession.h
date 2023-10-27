@@ -242,6 +242,20 @@ protected:
     virtual ssize_t getJpegBufferSize(uint32_t width, uint32_t height) const override;
 
     virtual void notifyError(uint32_t frameNumber, int32_t streamId, ErrorCode ec) override;
+
+    virtual VideoDecoder* getVideoDecoder() {
+        return mDecoder;
+    }
+
+    virtual VideoStreamInfo getVideoStreamInfo() {
+        return mVideoInfo;
+    }
+    virtual VConfig getVideoConfig() {
+        return mVideoConf;
+    }
+    virtual VideoStreamDataInfo getVideoStreamDataInfo() {
+        return mDataInfo;
+    }
     // End of OutputThreadInterface methods
 
     Status constructDefaultRequestSettingsRaw(RequestTemplate type,
@@ -389,6 +403,14 @@ protected:
 
 private:
 
+    VideoDecoder *                     mDecoder;
+    VConfig                            mVideoConf;
+    VideoStreamInfo                    mVideoInfo;
+    VideoStreamDataInfo                mDataInfo;
+    int                                mFrameRate;
+    int                                mForceFourcc;
+
+
     struct TrampolineSessionInterface_3_4 : public ICameraDeviceSession {
         TrampolineSessionInterface_3_4(sp<ExternalCameraDeviceSession> parent) :
                 mParent(parent) {}
@@ -450,6 +472,7 @@ private:
     private:
         sp<ExternalCameraDeviceSession> mParent;
     };
+
 };
 
 }  // namespace implementation
